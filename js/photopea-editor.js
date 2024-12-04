@@ -116,6 +116,22 @@ class LJPhotopeaEditorDialog extends ComfyDialog {
     bottom_panel.appendChild(self.fullscreenButton);
     bottom_panel.appendChild(self.saveButton);
     bottom_panel.appendChild(cancelButton);
+
+    // replacement of onClose hook since close is not real close
+    const observer = new MutationObserver(function(mutations) {
+      mutations.forEach(function(mutation) {
+          if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
+            if(self.last_display_style && self.last_display_style != 'none' && self.element.style.display == 'none') {
+              ComfyApp.onClipspaceEditorClosed();
+            }
+  
+            self.last_display_style = self.element.style.display;
+          }
+        });
+      });
+  
+      const config = { attributes: true };
+      observer.observe(this.element, config);
   }
 
   show() {
